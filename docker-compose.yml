@@ -5,8 +5,9 @@ services:
     image: postgres:14.3
     restart: always
     ports:
-      - '5432:5432'
+      - '5434:5432'
     environment:
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${pass}
       POSTGRES_DB: ${name}
     container_name: ocso_db
