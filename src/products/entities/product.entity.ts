@@ -1,4 +1,4 @@
-import {Entity, Column, PrimaryGeneratedColumn, EntityNotFoundError, IsNull} from "typeorm";
+import {Entity, Column, PrimaryGeneratedColumn, EntityNotFoundError, IsNull, Generated} from "typeorm";
 
 @Entity()
 
@@ -13,5 +13,6 @@ export class Product {
         @Column({type: "int"})
         countSeal: number;
         @Column({type: "uuid"})
+        @Generated('uuid')
         provider: string;
 } 

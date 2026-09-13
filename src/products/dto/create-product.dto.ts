@@ -11,7 +11,7 @@ export class CreateProductDto {
     price: number;
     @IsInt()
     countSeal: number;
-    @IsString()
     @IsUUID()
-    provider: string;
+    @IsOptional()
+    provider?: string;
 }
