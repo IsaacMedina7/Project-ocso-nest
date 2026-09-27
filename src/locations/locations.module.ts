@@ -3,6 +3,8 @@ import { LocationsService } from './locations.service';
 import { LocationsController } from './locations.controller';
 import { TypeORMError } from 'typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Location } from './entities/location.entity';
+
 
 @Module({
   imports: [TypeOrmModule.forFeature([Location])],

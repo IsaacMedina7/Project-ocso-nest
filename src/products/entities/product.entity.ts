@@ -1,4 +1,4 @@
-import {Entity, Column, ManyToOne, PrimaryGeneratedColumn, EntityNotFoundError, IsNull, Generated} from "typeorm";
+import {Entity, Column, ManyToOne, PrimaryGeneratedColumn, JoinColumn, EntityNotFoundError, IsNull, Generated} from "typeorm";
 import { Provider } from "../../providers/entities/provider.entity";
 
 @Entity()
@@ -15,5 +15,8 @@ export class Product {
         @ManyToOne(() => Provider, (provider) => provider.products, {
                 eager:true,
         })
+        @JoinColumn({
+                name: "providerId"
+            })
         provider: Provider
 } 
