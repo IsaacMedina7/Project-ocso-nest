@@ -1,8 +1,7 @@
-import {Entity, Column, PrimaryGeneratedColumn, EntityNotFoundError, IsNull, Generated} from "typeorm";
+import {Entity, Column, ManyToOne, PrimaryGeneratedColumn, EntityNotFoundError, IsNull, Generated} from "typeorm";
+import { Provider } from "../../providers/entities/provider.entity";
 
 @Entity()
-
-
 export class Product {
         @PrimaryGeneratedColumn("uuid")
         productId: string;
@@ -12,7 +11,7 @@ export class Product {
         price: number;
         @Column({type: "int"})
         countSeal: number;
-        @Column({type: "uuid"})
-        @Generated('uuid')
-        provider: string;
+        
+        @ManyToOne(() => Provider, (provider) => provider.products)
+        provider: Provider
 } 
