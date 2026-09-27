@@ -1,1 +1,17 @@
-export class Manager {}
+import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+
+@Entity()
+export class Manager {
+
+    @PrimaryGeneratedColumn()
+    managerId: string;
+    @Column("text")
+    managerFullName: string;
+    @Column("float")
+    managerSalary: number;
+    @Column("text")
+    managerEmail: string;
+    @Column("text")
+    managerPhoneNumber: string;
+    // Relacion con Location
+}
