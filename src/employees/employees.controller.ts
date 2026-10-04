@@ -6,12 +6,26 @@ import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import 'multer';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { ROLES } from '../auth/constants/roles.constants';
+import { ApiResponse } from '@nestjs/swagger';
+import { Employee } from './entities/employee.entity';
+import { ApiAuth } from '../auth/decorators/api.decorator';
 
+@ApiAuth()
 @Controller('employees')
 export class EmployeesController {
   constructor(private readonly employeesService: EmployeesService) {}
 
   @Auth(ROLES.MANAGER)
+  @ApiResponse({
+    status: 201,
+    example: {
+      employeeId: "UUID",
+      employeeName: "Isaac",
+      employeeEmail: "isaac@gmail.com",
+      employeeLastName: "Cisneros",
+      employeePhoneNumber: "4426463462"
+    } as Employee
+  })
   @Post()
   create(@Body() createEmployeeDto: CreateEmployeeDto) {
     return this.employeesService.create(createEmployeeDto);
@@ -36,6 +50,12 @@ export class EmployeesController {
     return this.employeesService.findOne(id);
   }
 
+  @Auth(ROLES.MANAGER) 
+  @Get('/location/:id')
+  findAllLocation(@Param('id')id: string){
+    return this.employeesService.findByLocation(+id);
+  }
+
   @Auth(ROLES.EMPLOYEE)
   @Patch(':id')
   update(@Param('id', new ParseUUIDPipe({version: '4'})) id: string, @Body() updateEmployeeDto: UpdateEmployeeDto) {
@@ -47,4 +67,5 @@ export class EmployeesController {
   remove(@Param('id', new ParseUUIDPipe({version: '4'})) id: string) {
     return this.employeesService.remove(id);
   }
+
 }
