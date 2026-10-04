@@ -6,7 +6,9 @@ import { Employee } from "../../employees/entities/employee.entity";
 export class User {
     @PrimaryGeneratedColumn('uuid')
     userId: string;
-    @Column("text")
+    @Column("text", {
+        unique: true
+    })
     userEmail: string;
     @Column("text")
     userPassword: string;
@@ -15,10 +17,14 @@ export class User {
     })
     userRoles: string[];
     
-    @OneToOne(() => Manager)
+    @OneToOne(() => Manager, {
+        eager: true
+    })
     manager: Manager;
 
-    @OneToOne(() => Employee)
+    @OneToOne(() => Employee, {
+        eager: true
+    })
     employee: Employee;
 
 }
