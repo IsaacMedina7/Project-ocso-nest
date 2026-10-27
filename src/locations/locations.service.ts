@@ -24,7 +24,7 @@ export class LocationsService {
     locationId: id,
    })
    if(!location) throw new NotFoundException("Location Not Found")
-    return location
+    return location;
   }
 
   async update(id: number, updateLocationDto: UpdateLocationDto) {

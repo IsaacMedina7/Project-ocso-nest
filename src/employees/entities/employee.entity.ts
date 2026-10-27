@@ -6,17 +6,18 @@ import { ApiProperty } from "@nestjs/swagger";
 @Entity()
 
 export class Employee {
+       
         @PrimaryGeneratedColumn("uuid")
         employeeId: string;
 
         @ApiProperty({
-                            default: "Isaac"
-                        })
+                default: "Isaac"
+                })
         @Column({type: "text"})
         employeeName: string;
 
         @ApiProperty({
-                    default: "Cisneros"
+                default: "Cisneros"
                 })
         @Column({type: "text"})
         employeeLastName: string;
@@ -34,11 +35,13 @@ export class Employee {
          unique: true
         })
         employeeEmail: string;
+
         @Column({
                 type: "text",
                 nullable: true
         })
         employeePhoto: string;
+
         @ManyToOne(() => Location, (location) => location.employees)
         @JoinColumn({
                 name:"locationId"
@@ -49,5 +52,5 @@ export class Employee {
         @JoinColumn({
                 name:"userId"
         })
-            user: User;
-} 
+        user: User;
+}

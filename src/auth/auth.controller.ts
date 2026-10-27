@@ -29,7 +29,7 @@ export class AuthController {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       //expires: new Date().setDate()
     });
-    return;
+    return; 
   }
   @Patch("/:email")
   updateUser(@Param('email') userEmail: string, @Body() updateUserDto: UpdateUserDto) {
