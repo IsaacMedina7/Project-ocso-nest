@@ -15,9 +15,24 @@ export class LocationsService {
     @InjectRepository(Manager)
     private managerRepository: Repository<Manager>
   ) { }
-  create(createLocationDto: CreateLocationDto) {
-    return this.locationRepository.save(createLocationDto)
+ async create(createLocationDto: CreateLocationDto) {
+  // 1. Guardar la ubicación en la tabla location (guarda managerId ahí)
+  const location = await this.locationRepository.save(createLocationDto);
+
+  // 2. Si viene un manager seleccionado, actualizar la tabla manager con el locationId
+  if (createLocationDto.manager) {
+    const manager = await this.managerRepository.preload({
+      managerId: createLocationDto.manager,
+      location: location,
+    });
+
+    if (manager) {
+      await this.managerRepository.save(manager);
+    }
   }
+
+  return location;
+}
 
   findAll() {
     return this.locationRepository.find()
@@ -33,31 +48,35 @@ export class LocationsService {
 
   async update(id: number, updateLocationDto: UpdateLocationDto) {
 
-    // Set Manager to null
-    this.managerRepository.createQueryBuilder().update().set({ location: null }).where("locationId = :id", {
-      id,
-    }).execute();
+  // 1. Agregado await para esperar la desasignación previa del manager en PostgreSQL
+  await this.managerRepository
+    .createQueryBuilder()
+    .update()
+    .set({ location: null })
+    .where("locationId = :id", { id })
+    .execute();
 
-    const location = await this.locationRepository.preload({
-      locationId: id,
-      ...updateLocationDto
-    })
-    if (!location) throw new NotFoundException
+  const location = await this.locationRepository.preload({
+    locationId: id,
+    ...updateLocationDto,
+  });
 
-    const savedLocation = this.locationRepository.save(location)
+  if (!location) throw new NotFoundException("Location Not Found");
 
-    const updatedManager = await this.managerRepository.preload({
-      managerId: updateLocationDto.manager,
-      location: location,
-    })
+  // 2. Agregado await para guardar la entidad resuelta
+  const savedLocation = await this.locationRepository.save(location);
 
-    if (updatedManager) {
-      await this.managerRepository.save(updatedManager);
-    }
+  const updatedManager = await this.managerRepository.preload({
+    managerId: updateLocationDto.manager,
+    location: location,
+  });
 
-    return savedLocation;
-
+  if (updatedManager) {
+    await this.managerRepository.save(updatedManager);
   }
+
+  return savedLocation;
+}
 
   remove(id: number) {
     return this.locationRepository.delete({
