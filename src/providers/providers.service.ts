@@ -11,36 +11,51 @@ export class ProvidersService {
   constructor(
     @InjectRepository(Provider)
     private providerRepository: Repository<Provider>
-  ){}
+  ) { }
 
   create(createProviderDto: CreateProviderDto) {
     return this.providerRepository.save(createProviderDto);
   }
 
   findAll() {
-    return this.providerRepository.find();
-  }
-
-  findOne(id: string) {
-    return this.providerRepository.findOneBy({
-      providerId: id,
+    return this.providerRepository.find({
+      relations: {
+        products: true,
+      }
     });
   }
 
-  findOneByName(name: string){
+  async findOne(id: string) {
+    const provider = await this.providerRepository.findOne({
+      where: {
+        providerId: id,
+      },
+      relations: {
+        products: true,
+      }
+    });
+
+    if (!provider) {
+      throw new NotFoundException(`El Proveedor no fue encontrado`);
+    }
+
+    return provider;
+  }
+
+  findOneByName(name: string) {
     const provider = this.providerRepository.findBy({
       providerName: Like(`%${name}%`),
     })
-    if(!provider) throw new NotFoundException()
+    if (!provider) throw new NotFoundException()
     return provider
-  } 
+  }
 
   async update(id: string, updateProviderDto: UpdateProviderDto) {
     const product = await this.providerRepository.preload({
       providerId: id,
       ...updateProviderDto
     });
-    if(!product) throw new NotFoundException
+    if (!product) throw new NotFoundException
     return this.providerRepository.save(product);
   }
 
@@ -49,7 +64,7 @@ export class ProvidersService {
       providerId: id,
     })
     return {
-      message: "Provider deleted"
+      message: "Provider borrado"
     }
   }
 }

@@ -13,33 +13,33 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('Providers')
 @Controller('providers')
 export class ProvidersController {
-  constructor(private readonly providersService: ProvidersService) {}
+  constructor(private readonly providersService: ProvidersService) { }
 
   @Auth(ROLES.MANAGER)
   @Post()
   create(@Body() createProviderDto: CreateProviderDto) {
     return this.providersService.create(createProviderDto);
-  } 
+  }
 
   @Auth(ROLES.EMPLOYEE, ROLES.MANAGER)
   @Get()
   findAll(@UserData() user: User) {
-    if(user.userRoles.includes("Employee")) throw new UnauthorizedException("No estas autorizado, solo admins y managers")
+    if (user.userRoles.includes("Employee")) throw new UnauthorizedException("No estas autorizado, solo admins y managers")
     return this.providersService.findAll();
   }
 
   @Auth(ROLES.EMPLOYEE, ROLES.MANAGER)
-  @Get(':name')
-  findByName(@Param('name') name: string){
-    return this.providersService.findOneByName(name);
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    const provider = await this.providersService.findOne(id);
+    if (!provider) throw new NotFoundException('Proveedor no encontrado');
+    return provider;
   }
 
   @Auth(ROLES.EMPLOYEE, ROLES.MANAGER)
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    const provider = this.providersService.findOne(id);
-    if(!provider) throw new NotFoundException()
-      return provider
+  @Get(':name')
+  findByName(@Param('name') name: string) {
+    return this.providersService.findOneByName(name);
   }
 
   @Auth(ROLES.MANAGER)
