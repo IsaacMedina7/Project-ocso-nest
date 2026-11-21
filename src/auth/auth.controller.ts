@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, BadRequestException, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -12,15 +12,20 @@ import { TOKEN_NAME } from './constants/jwt.constants';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
-  @Post('signup')
-  signUp(@Body() CreateUserDto: CreateUserDto){
-    return this.authService.registerUser(CreateUserDto)
+  @Post("register/:id")
+  registerManager(@Query("role") role: string, @Body() CreateUserDto: CreateUserDto, @Param("id") id: string) {
+    if (role === "manager") {
+      return this.authService.registerManager(id, CreateUserDto)
+    } else if (role === "employee") {
+      return this.authService.registerEmployee(id, CreateUserDto)
+    }
+    throw new BadRequestException("Rol invalido");
   }
 
   @Post('login')
-  async login(@Body() LoginUserDto: LoginUserDto, @Res({passthrough: true}) response: Response){
+  async login(@Body() LoginUserDto: LoginUserDto, @Res({ passthrough: true }) response: Response) {
     const token = await this.authService.loginUser(LoginUserDto)
     response.cookie(TOKEN_NAME, token, {
       httpOnly: false,
@@ -29,7 +34,7 @@ export class AuthController {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       //expires: new Date().setDate()
     });
-    return; 
+    return;
   }
   @Patch("/:email")
   updateUser(@Param('email') userEmail: string, @Body() updateUserDto: UpdateUserDto) {
