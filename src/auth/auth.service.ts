@@ -73,26 +73,22 @@ export class AuthService {
     return token
   }
 
-  async updateUser(userEmail: string, updateUserDto: UpdateUserDto) {
-    // 1. Buscamos primero al usuario para obtener su ID primario
-    const user = await this.userRepository.findOne({ where: { userEmail } });
-
-    if (!user) {
-      throw new NotFoundException(`El usuario con el correo ${userEmail} no existe`);
+  async updateUser(id: string, updateUserDto: UpdateUserDto) {
+    if (updateUserDto.userPassword) {
+      updateUserDto.userPassword = bcrypt.hashSync(updateUserDto.userPassword, 5);
     }
 
-    // 2. Precaramos los datos pasando el ID primario del usuario
     const newUserData = await this.userRepository.preload({
-      userId: user.userId, // Usa la clave primaria exacta definida en user.entity.ts
-      ...updateUserDto
+      userId: id,
+      ...updateUserDto,
     });
 
     if (!newUserData) {
-      throw new NotFoundException("No se pudieron precargar los datos del usuario");
+      throw new NotFoundException(`El usuario con ID ${id} no existe`);
     }
 
-    // 3. Guardamos y retornamos los datos actualizados
-    return await this.userRepository.save(newUserData);
+    await this.userRepository.save(newUserData);
+    return newUserData;
   }
 
 }
